@@ -16,7 +16,6 @@
 #include <iostream>
 #include <cmath>
 
-
 double f1(double);
 double f2(double);
 double simpsons(double a, double b, double(*f)(double), double ti);
@@ -26,11 +25,15 @@ double trapezoid(double a, double b, int val, double(*f)(double), double ti);
 double simpsons(double a, double b, double(*f)(double), double ti){
 	double h = (b-a) / ti;
 	double sum = (*f)(a) + (*f)(b);
-	for(int i = 1; i<b; i+=2){
+	for(double i = a+h; i<b;){
 		sum += (4 * (*f)(i));
-		sum += (2 * (*f)(i+1));
+		i+=(2*h);
 	}
-	sum += (4 * (*f)(b-1));
+	for(double i = a+(2*h); i<b;){
+		sum += (2 * (*f)(i));
+		i+=(2*h);
+	}
+	/* sum += (4 * (*f)(b-1)); */
 	return sum * (h/3);
 }
 
