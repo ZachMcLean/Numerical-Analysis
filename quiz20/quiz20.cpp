@@ -22,8 +22,9 @@
 double func(double x, double t);
 
 int main(){
+	std::cout<<"\nFor ODE: x' = (x + t^2) and x(0) = 1. \n";
 	int n; // number of sub intervals
-	std::cout<<"Enter number of iterations: ";
+	std::cout<<"\nEnter number of iterations(5): ";
 	std::cin>>n;
 	std::cout<<"\n";
 
@@ -34,27 +35,29 @@ int main(){
 	bool stop = false;
 	double k[n];
 
-	printf("Compute Euler's method for x(%.2f) with %.2f iterations. \n", x, n);
+	printf("Compute Euler's method for x(%.2f) with %d iterations. \n", x, n);
 	for(int i = 0; i < n; i++){
 		x = x + (h * func(x, t));
 		t = t+h;
 		printf("x(%.2f)= %.2f \n", t, x);
 	}
+	std::cout<<"\n";
 
 	x = 1.0;
 	t = 0.0;
-	printf("Compute Heuns method for x(%.2f) with %.2f iterations. \n", x, n);
-	for(int i = 0; i<n; i++){
+	printf("Compute Heuns method for x(%.2f) with %d iterations. \n", x, n);
+	for(int i = 0; i < n; i++){
 		K = x + (h * func(x, t));
 		x = x + ((h/2) * ((func(x, t) + (func(K, t+h)))));
 		t = t + h;
 		printf("x(%.2f + h)= %.2f \n", t, x);
 	}
+	std::cout<<"\n";
 
 	x = 1.0;
 	t = 0.0;
 	n = 1; // Entire sub-interval
-	printf("Compute Runge-Kutta method for x(%.f) with %.2f iterations. \n", x, n);
+	printf("Compute Runge-Kutta method for x(%.f) with %d iterations. \n", x, n);
 	h = (x-t)/n;
 	while(stop==false){
 		k[0] = h*(func(x, t));
@@ -65,6 +68,7 @@ int main(){
 		printf("x(%.f)= %.2f \n", h, K);
 		stop = true;
 	}
+	std::cout<<"\n";
 }
 
 
