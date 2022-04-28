@@ -5,8 +5,6 @@
 // Approximate the roor of the function using Bisection, Newton's, and Secant Method
 // Including the use of Horners Algorithm to evaluate the Taylor Polynomial of e^x - 1 / x
 
-
-
 #include <iostream>
 #include <cmath>
 #include <stdio.h> //for printf
@@ -53,9 +51,9 @@ int main() {
 	std::cout <<"================================================================"<<std::endl;
 	printf("Interval: [%.6f, %.6f]\n", x, y);
 	
-	/* std::cout <<"================"<<std::endl; */
-	/* std::cout <<"Bisection Method: \n"; */
-	/* bisection(x, y, xTolerance, yTolerance, polyf, degf); */
+	std::cout <<"================"<<std::endl;
+	std::cout <<"Bisection Method: \n";
+	bisection(x, y, xTolerance, yTolerance, polyf, degf);
 	std::cout <<"================"<<std::endl;
 	std::cout <<"Newton's Method: \n";
 	newtons(x, xTolerance, yTolerance, polyf, polyd, degf, degd);
@@ -67,17 +65,19 @@ int main() {
 }
 
 // calculate the horners algorithm for the values in the polynomial array
+// polyf == 6 + x(-5 + x(-2 + x(1)))
+// polyd == (-5) + x(-4 + x(3)) 
 double horners(double poly[], int n, double h) // g(x) for single precision
 {
-	double approx;
+	double approx = 0.0;
     // Evaluate approximate value of polynomial using Horner's method
-    for (int i=0; i<=n-1; i++){
+    for (int i = 0; i < n; i++){
 		if(i==0){
 			approx = poly[0];
 		}else{
-			approx = approx * pow(h, n-i) + poly[i] ;
+			approx = (approx * h) + poly[i] ;
 		}
-		std::cout<<"approx: "<<approx<<std::endl;
+		/* std::cout<<"approx: "<<approx<<std::endl; */
 	}
 	return approx;
 }
@@ -95,6 +95,8 @@ double horners(double poly[], int n, double h) // g(x) for single precision
 //				a == c
 //
 void bisection(double a, double b, double xTolerance, double yTolerance, double polyf[], int degf){
+	std::cout <<"================================================================"<<std::endl;
+	std::cout <<"Iteration    Approx. root    x_tolerance    y_tolerance    "<<std::endl;
 	int i = 0;
 	while(i <= maxIterations && xTolerance >= 0.001 && yTolerance >= 0.00001){
 		double c = (a*b) / 2; // calculate the midpoint of our two guesses
@@ -116,8 +118,6 @@ void bisection(double a, double b, double xTolerance, double yTolerance, double 
 		}
 		/* printf("%d       %.6f       %.6f       %.6f       \n",i, c, xTolerance, yTolerance); */
 		
-		std::cout <<"================================================================"<<std::endl;
-		std::cout <<"Iteration    Approx. root    x_tolerance    y_tolerance    "<<std::endl;
 		xTolerance = b-c; 
 		yTolerance = abs(fa);
 		i++;
@@ -142,24 +142,23 @@ void bisection(double a, double b, double xTolerance, double yTolerance, double 
 void newtons(double x0, double xTolerance, double yTolerance, double polyf[], double polyd[], int degf, int degd){
 	std::cout <<"================================================================"<<std::endl;
 	std::cout <<"Iteration    Approx. root    x_tolerance    y_tolerance    "<<std::endl;
-	int i = 0;
+	int i = 1;
 	double xi; // create approx. root
 	while(i <= maxIterations && xTolerance >= 0.001 && yTolerance >= 0.00001){
 		
 		double func = horners(polyf, degf, x0); // calculate p(x) for x0
 		double deriv = horners(polyd, degd, x0); // calculate p'(x) for x0
 		xi = x0 - (func/deriv); // newton formula
-		printf("func, deriv, x0, x1: %f %f %f %f\n", func, deriv, x0, xi);
+		double funcy = horners(polyf, degf, xi);
+		/* printf("func, deriv, x0, x1: %f %f %f %f\n", func, deriv, x0, xi); */
+
 		xTolerance = abs(x0 - xi); // xTolerance = 0.001
-		yTolerance = abs(xTolerance - 1.048000); // |f(xn)| < tolerance = 0.00001
+		yTolerance = abs(funcy); // |f(xi-1)| < tolerance = 0.00001
 		x0 = xi; // set x(last guess) == to our new approx. root
 		printf("   %d        %.6f        %.6f        %.6f   \n",i, xi, xTolerance, yTolerance);
 		i++; // decrease i until number of max iterations is reached
 	}
-	std::cout <<"    Appromimated root: " << xi <<std::endl;
-	std::cout <<"    Number of iterations: " << i <<std::endl;
-	std::cout <<"    x_tolerance: " << xTolerance <<std::endl;
-	std::cout <<"    y_tolerance: " << yTolerance <<std::endl;
+	printf("    Appromimated root: %.6f \n    Number of iterations:  %d \n    x_tolerance: %.6f\n    y_tolerance: %.6f \n", xi, i-1, xTolerance, yTolerance);
 }
 //  Take Newton's formula and replace the derivative with the slope of f(x)
 //  Need two initial guesses = x0 & x1
