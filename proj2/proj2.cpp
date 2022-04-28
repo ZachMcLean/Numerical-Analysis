@@ -27,7 +27,7 @@ const int maxIterations = 20;
 int main() {
 	// Temporary hard coded value for initial guess
 	double x = 0.0;
-	double y = 4.0;
+	double y = 2.0;
 	// function
 	double polyf[4];
 	polyf[0] = 1.0;
@@ -83,7 +83,7 @@ double horners(double poly[], int n, double h) // g(x) for single precision
 }
 
 // Psuedocode:
-//	[a, b] = first two guesses; c = root = (a*b)/2
+//	[a, b] = first two guesses; c = root = (a+b)/2
 //	Bisection Method:
 //	while (f(c)<0)
 //		if f(a)xf(b)<0
@@ -95,42 +95,74 @@ double horners(double poly[], int n, double h) // g(x) for single precision
 //				a == c
 //
 void bisection(double a, double b, double xTolerance, double yTolerance, double polyf[], int degf){
-	std::cout <<"================================================================"<<std::endl;
-	std::cout <<"Iteration    Approx. root    x_tolerance    y_tolerance    "<<std::endl;
-	int i = 0;
-	while(i <= maxIterations && xTolerance >= 0.001 && yTolerance >= 0.00001){
-		double c = (a*b) / 2; // calculate the midpoint of our two guesses
-		/* int degf = sizeof(*polyf)/sizeof(polyf[0]); // calculate degree of p(x) */
-
-		double fa = horners(polyf, degf, a); // calculate f(a)
-		double fb = horners(polyf, degf, b); // calculate f(b)
-		double fc = horners(polyf, degf, c); // calculate f(b)
-		if((fa*fb) < 0){
-			if(fc == 0){
-				printf("%d       %.6f       %.6f       %.6f       \n",i, c, xTolerance, yTolerance);
-				i = maxIterations;
-			}else if(fa*fc < 0){
-				b = c;
-
-			}else if(fc*fb < 0){
-				a = c;
+	int i = 1;
+	double c = 0.0;
+	double fa = horners(polyf, degf, a); // calculate f(a)
+	double fb = horners(polyf, degf, b); // calculate f(b)
+	double fc = 0.0;
+	if((fa*fb) < 0.0){
+		c = (a+b)/2.0;
+		std::cout <<"================================================================"<<std::endl;
+		std::cout <<"Iteration    Approx. root    x_tolerance    y_tolerance    "<<std::endl;
+		while(i <= maxIterations && xTolerance >= 0.001 && yTolerance >= 0.00001){
+			fc = horners(polyf, degf, c); // calculate f(c)
+			if(fc == 0.0){
+				xTolerance = abs(a - c);
+				yTolerance = abs(fc);
+				break;
+			}else{
+				fa = horners(polyf, degf, a); // calculate f(a)
+				fb = horners(polyf, degf, b); // calculate f(b)
+				if((fa * fb)>0){
+					a = c;
+				}else{
+					b=c;
+				}
+			c = (a+b)/2.0;
+			printf("     %d        %.6f        %.6f        %.6f   \n",i, c, xTolerance, yTolerance);
+			i++;
 			}
 		}
-		/* printf("%d       %.6f       %.6f       %.6f       \n",i, c, xTolerance, yTolerance); */
-		
-		xTolerance = b-c; 
-		yTolerance = abs(fa);
-		i++;
+		printf("     %d        %.6f        %.6f        %.6f   \n",i, c, xTolerance, yTolerance);
+		printf("Exact root found at %.6f \n", c);
+		std::cout <<"Number of iterations: " << i <<std::endl;
+		std::cout<<"\n";
 
 	}
-	if(i == maxIterations){
-		std::cout<<"found no root on the interval\n";
-	}
 	else{
-	std::cout <<"Number of iterations: " << i <<std::endl;
-	std::cout <<"x_tolerance: " << xTolerance <<std::endl;
-	std::cout <<"y_tolerance: " << yTolerance <<std::endl;
+		std::cout<<"found no root on the interval /n";
 	}
+	/* bool foundRoot = false; */
+	/* while(i <= maxIterations && foundRoot == false && xTolerance >= 0.001 && yTolerance >= 0.00001){ */
+	/* 	c = (a+b) / 2.0; // calculate the midpoint of our two guesses */
+	/* 	/1* int degf = sizeof(*polyf)/sizeof(polyf[0]); // calculate degree of p(x) *1/ */
+
+	/* 	double fa = horners(polyf, degf, a); // calculate f(a) */
+	/* 	double fb = horners(polyf, degf, b); // calculate f(b) */
+	/* 	double fc = horners(polyf, degf, c); // calculate f(c) */
+	/* 	if((fa*fb) < 0.0){ */
+
+	/* 		if(fc == 0.0){ */
+	/* 			printf("%d       %.6f       %.6f       %.6f       \n",i, c, xTolerance, yTolerance); */
+	/* 			foundRoot = true; */
+	/* 		}else if(fa*fc < 0.0){ */
+	/* 			b = c; */
+
+	/* 		}else{ */
+	/* 			a = c; */
+	/* 		} */
+	/* 	}else{ */
+	/* 		std::cout<<"Found no root on the interval \n"; */
+	/* 		foundRoot = true; */
+	/* 	} */
+	/* 	/1* printf("%d       %.6f       %.6f       %.6f       \n",i, c, xTolerance, yTolerance); *1/ */
+		
+	/* 	xTolerance = b-c; */ 
+	/* 	yTolerance = abs(fc); */
+	/* 	i++; */
+
+	/* } */
+
 }
 //  start with first guess, not two
 //  Newtons Method:
@@ -155,7 +187,7 @@ void newtons(double x0, double xTolerance, double yTolerance, double polyf[], do
 		xTolerance = abs(x0 - xi); // xTolerance = 0.001
 		yTolerance = abs(funcy); // |f(xi-1)| < tolerance = 0.00001
 		x0 = xi; // set x(last guess) == to our new approx. root
-		printf("   %d        %.6f        %.6f        %.6f   \n",i, xi, xTolerance, yTolerance);
+		printf("     %d        %.6f        %.6f        %.6f   \n",i, xi, xTolerance, yTolerance);
 		i++; // decrease i until number of max iterations is reached
 	}
 	printf("    Appromimated root: %.6f \n    Number of iterations:  %d \n    x_tolerance: %.6f\n    y_tolerance: %.6f \n", xi, i-1, xTolerance, yTolerance);
