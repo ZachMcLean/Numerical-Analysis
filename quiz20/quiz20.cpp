@@ -1,17 +1,19 @@
 // Zach McLean
 // Numerical Analysis
-// 4/15/2022
+// 4/27/2022
 // Quiz 20
 // Calculate and verify the answers of Quiz 19 using Eulers and Huen's Method
-// to find the approximate value of x' = t-x with x(2) = 4 && h = 1
+// to find the approximate value of x' = x + t*t with x(0) = 1 && h = b - a / n
+//										a = 0 ; b = 1 ; n = 5
 //
 // Heun's method is a two step process and can be written as
 // Step 1: K = x(t) + h*f(t, x(t)) (Euler's Method)
-//						= x'(t)
-//						= (t - x(t))
+//			 = x(t) + h * x'(t)
+//					= (x(t) + t*t)
 // Step 2: x(t+h) = x(t) + 1/2*h*[f(t, x(t)) + f(t+h, K)]
+//								 [(x(t) + t*t) + (K + x(t+h))]
 //
-// Compute the approximate value of x(3) && x(4)
+// Compute the approximate value of x(1)
 //
 
 #include <iostream>
@@ -20,35 +22,57 @@
 double func(double x, double t);
 
 int main(){
-	int n; // x(t+h)
-	double t = 2.0;
-	double xt = 4.0;
-	int h = 1;
-	double K=0.0;
-
+	int n; // number of sub intervals
 	std::cout<<"Enter number of iterations: ";
 	std::cin>>n;
 	std::cout<<"\n";
-	// set up hardcoded values
-	// x' = t - x
 
+	double t = 0.0;
+	double x = 1.0;
+	double h = (x-t)/n;
+	double K=0.0;
+	bool stop = false;
+	double k[n];
 
-	printf("Compute Euler's method for x(%.2f) iterations. \n", n);
-	for(int i = 1; i <= n; i++){
-		xt = 
+	printf("Compute Euler's method for x(%.2f) with %.2f iterations. \n", x, n);
+	for(int i = 0; i < n; i++){
+		x = x + (h * func(x, t));
+		t = t+h;
+		printf("x(%.2f)= %.2f \n", t, x);
 	}
 
-	printf("Compute Heuns method for x(%.2f) iterations. \n", n);
-	for(int i = t; i<n; i++){
-		K = xt + h * func(xt, t);
-		xt = xt + 0.5*(h*((t-xt)+((t+h)-K)));
+	x = 1.0;
+	t = 0.0;
+	printf("Compute Heuns method for x(%.2f) with %.2f iterations. \n", x, n);
+	for(int i = 0; i<n; i++){
+		K = x + (h * func(x, t));
+		x = x + ((h/2) * ((func(x, t) + (func(K, t+h)))));
 		t = t + h;
-		printf("x(t+h)= %.2f\n", xt);
+		printf("x(%.2f + h)= %.2f \n", t, x);
+	}
+
+	x = 1.0;
+	t = 0.0;
+	n = 1; // Entire sub-interval
+	printf("Compute Runge-Kutta method for x(%.f) with %.2f iterations. \n", x, n);
+	h = (x-t)/n;
+	while(stop==false){
+		k[0] = h*(func(x, t));
+		k[1] = h*(func(x + (k[0]/2), t + (h/2)));
+		k[2] = h*(func(x + (k[1]/2), t + (h/2)));
+		k[3] = h*(func(x + k[2], t+h));
+		K = x + ((1.0/6.0) * (k[0] + 2*k[1] + 2*k[2] + k[3]));
+		printf("x(%.f)= %.2f \n", h, K);
+		stop = true;
 	}
 }
 
+
+
+
+
 double func(double x, double t){
-	return (x - t);	
+	return (x + (t*t));	
 }
 
 
