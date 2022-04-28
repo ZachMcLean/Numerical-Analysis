@@ -26,42 +26,58 @@ const int maxIterations = 20;
 
 int main() {
 	// Temporary hard coded value for initial guess
-	double x = 0.0;
-	double y = 2.0;
-	// function
-	double polyf[4];
-	polyf[0] = 1.0;
-	polyf[1] = -2.0;
-	polyf[2] = -5.0;
-	polyf[3] = 6.0;
+	/* double x = 0.0; */
+	/* double y = 2.0; */
+	int c = '1';
+	bool stop = false;
+	double x, y;
+	while(stop == false){
+		std::cout<<"Please enter an interval[x y]: ";
+		std::cin>> x >> y;
+		std::cout<<"\n";
+		
+		// function
+		double polyf[4];
+		polyf[0] = 1.0;
+		polyf[1] = -2.0;
+		polyf[2] = -5.0;
+		polyf[3] = 6.0;
 
+		// derivative
+		double polyd[3];
+		polyd[0] = 3.0;
+		polyd[1] = -4.0;
+		polyd[2] = -5.0;
 
-	// derivative
-	double polyd[3];
-	polyd[0] = 3.0;
-	polyd[1] = -4.0;
-	polyd[2] = -5.0;
+		int degf = sizeof(polyf)/sizeof(polyf[0]); // calculate degree of p(x)
+		int degd = sizeof(polyd)/sizeof(polyd[0]); // calculate degree of p'(x)
 
-	int degf = sizeof(polyf)/sizeof(polyf[0]); // calculate degree of p(x)
-	int degd = sizeof(polyd)/sizeof(polyd[0]); // calculate degree of p'(x)
+		double xTolerance = 0.001;
+		double yTolerance = 0.00001;
 
-	double xTolerance = 0.001;
-	double yTolerance = 0.00001;
+		std::cout <<"================================================================"<<std::endl;
+		printf("Interval: [%.6f, %.6f]\n", x, y);
+		std::cout<<"\n";
+		
+		std::cout <<"================"<<std::endl;
+		std::cout <<"Bisection Method: \n";
+		bisection(x, y, xTolerance, yTolerance, polyf, degf);
+		std::cout <<"================"<<std::endl;
+		std::cout <<"Newton's Method: \n";
+		newtons(x, xTolerance, yTolerance, polyf, polyd, degf, degd);
+		std::cout <<"================"<<std::endl;
+		std::cout <<"Secant's Method: \n";
+		secant(x, y, xTolerance, yTolerance, polyf, degf);
 
-	std::cout <<"================================================================"<<std::endl;
-	printf("Interval: [%.6f, %.6f]\n", x, y);
-	std::cout<<"\n";
-	
-	std::cout <<"================"<<std::endl;
-	std::cout <<"Bisection Method: \n";
-	bisection(x, y, xTolerance, yTolerance, polyf, degf);
-	std::cout <<"================"<<std::endl;
-	std::cout <<"Newton's Method: \n";
-	newtons(x, xTolerance, yTolerance, polyf, polyd, degf, degd);
-	std::cout <<"================"<<std::endl;
-	std::cout <<"Secant's Method: \n";
-	secant(x, y, xTolerance, yTolerance, polyf, degf);
-
+		std::cout<<"Would you like to enter another interval?(y=1/n=0): ";
+		std::cin>>c;
+		if(c == 0){
+			stop = true;
+		}else if(c > 1 || c < 0){
+			std::cout<<"invalid input";
+			stop = true;
+		}
+	}
 	return 0;
 }
 
@@ -101,6 +117,7 @@ void bisection(double a, double b, double xTolerance, double yTolerance, double 
 	double fa = horners(polyf, degf, a); // calculate f(a)
 	double fb = horners(polyf, degf, b); // calculate f(b)
 	double fc = 0.0;
+	double x = 0.0;
 	if((fa*fb) < 0.0){
 		c = (a+b)/2.0;
 		std::cout <<"================================================================"<<std::endl;
@@ -108,30 +125,38 @@ void bisection(double a, double b, double xTolerance, double yTolerance, double 
 		while(i <= maxIterations && xTolerance >= 0.001 && yTolerance >= 0.00001){
 			fc = horners(polyf, degf, c); // calculate f(c)
 			if(fc == 0.0){
-				xTolerance = abs(a - c);
+				xTolerance = abs(x - c);
 				yTolerance = abs(fc);
 				break;
 			}else{
 				fa = horners(polyf, degf, a); // calculate f(a)
 				fb = horners(polyf, degf, b); // calculate f(b)
 				if((fa * fb)>0){
+					x = a;
 					a = c;
+
 				}else{
-					b=c;
+					x = b;
+					b = c;
 				}
-			c = (a+b)/2.0;
-			printf("        %d      %.6f       %.6f       %.6f    \n",i, c, xTolerance, yTolerance);
+
+				c = (a+b)/2.0;
+				xTolerance = abs(x - c);
+				yTolerance = abs(fc);
+
+			printf("       %2d      %10.6f       %10.6f       %10.6f    \n",i, c, xTolerance, yTolerance);
 			i++;
 			}
 		}
-		printf("        %d      %.6f       %.6f       %.6f    \n",i, c, xTolerance, yTolerance);
+		/* printf("        %d      %.6f       %.6f       %.6f    \n",i, c, xTolerance, yTolerance); */
 		printf("Exact root found at %.6f \n", c);
-		std::cout <<"Number of iterations: " << i <<std::endl;
+		std::cout <<"Number of iterations: " << i-1 <<std::endl;
 		std::cout<<"\n";
 
 	}
 	else{
-		std::cout<<"found no root on the interval /n";
+		std::cout<<"	found no root on the interval \n";
+		std::cout<<"\n";
 	}
 	/* bool foundRoot = false; */
 	/* while(i <= maxIterations && foundRoot == false && xTolerance >= 0.001 && yTolerance >= 0.00001){ */
@@ -177,7 +202,7 @@ void newtons(double x0, double xTolerance, double yTolerance, double polyf[], do
 	std::cout <<"Iteration     Approx. root    x_tolerance    y_tolerance    "<<std::endl;
 	int i = 1;
 	double xi; // create approx. root
-	while(i <= maxIterations && xTolerance >= 0.001 && yTolerance >= 0.00001){
+	while(i <= maxIterations && (xTolerance >= 0.001 && yTolerance >= 0.00001)){
 		
 		double func = horners(polyf, degf, x0); // calculate p(x) for x0
 		double deriv = horners(polyd, degd, x0); // calculate p'(x) for x0
@@ -188,7 +213,7 @@ void newtons(double x0, double xTolerance, double yTolerance, double polyf[], do
 		xTolerance = abs(x0 - xi); // xTolerance = 0.001
 		yTolerance = abs(funcy); // |f(xi-1)| < tolerance = 0.00001
 		x0 = xi; // set x(last guess) == to our new approx. root
-		printf("        %d      %.6f       %.6f       %.6f    \n",i, xi, xTolerance, yTolerance);
+		printf("       %2d      %10.6f       %10.6f       %10.6f    \n",i, xi, xTolerance, yTolerance);
 		i++; // decrease i until number of max iterations is reached
 	}
 	printf("    Appromimated root: %.6f \n    Number of iterations:  %d \n    x_tolerance: %.6f\n    y_tolerance: %.6f \n", xi, i-1, xTolerance, yTolerance);
@@ -214,7 +239,7 @@ void secant(double x0, double x1, double xTolerance, double yTolerance, double p
 		double funcy = horners(polyf, degf, x2);
 		xTolerance = abs(x1 - x2);
 		yTolerance = abs(funcy);
-		printf("        %d      %.6f       %.6f       %.6f    \n",i, x2, xTolerance, yTolerance);
+		printf("       %2d      %10.6f       %10.6f       %10.6f    \n",i, x2, xTolerance, yTolerance);
 		x0 = x1; // set x(last guess) == to our new approx. root
 		x1 = x2;
 		i++; // decrease i until number of max iterations is reached
