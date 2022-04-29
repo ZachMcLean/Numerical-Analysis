@@ -1,0 +1,165 @@
+Script started on 2022-04-28 00:21:59-05:00 [TERM="alacritty" TTY="/dev/pts/0" COLUMNS="212" LINES="52"]
+[?25l[?7l[0m[34m[1m                    /-
+                   ooo:
+                  yoooo/
+                 yooooooo
+                yooooooooo
+               yooooooooooo
+             .yooooooooooooo
+            .oooooooooooooooo
+           .oooooooarcoooooooo
+          .ooooooooo-oooooooooo
+         .ooooooooo-  oooooooooo
+        :ooooooooo.    :ooooooooo
+       :ooooooooo.      :ooooooooo
+      :oooarcooo         .oooarcooo
+     :ooooooooy           .ooooooooo
+    :ooooooooo   [37m[0m[1m/ooooooooooooooooooo[0m[34m[1m
+   :ooooooooo      [37m[0m[1m.-ooooooooooooooooo.[0m[34m[1m
+  ooooooooo-             [37m[0m[1m-ooooooooooooo.[0m[34m[1m
+ ooooooooo-                 [37m[0m[1m.-oooooooooo.[0m[34m[1m
+ooooooooo.                     [37m[0m[1m-ooooooooo[0m[34m[1m[0m
+[20A[9999999D[44C[0m[1m[0m[1mzach[0m@[0m[1msol[0m 
+[44C[0m--------[0m 
+[44C[0m[34m[1mOS[0m[0m:[0m ArcoLinux[0m 
+[44C[0m[34m[1mKernel[0m[0m:[0m 5.17.4-arch1-1[0m 
+[44C[0m[34m[1mUptime[0m[0m:[0m 8 hours, 31 mins[0m 
+[44C[0m[34m[1mPackages[0m[0m:[0m 1449 (pacman)[0m 
+[44C[0m[34m[1mShell[0m[0m:[0m bash 5.1.16[0m 
+[44C[0m[34m[1mResolution[0m[0m:[0m 1920x975[0m 
+[44C[0m[34m[1mWM[0m[0m:[0m dwm[0m 
+[44C[0m[34m[1mTheme[0m[0m:[0m Arc-Dark [GTK2/3][0m 
+[44C[0m[34m[1mIcons[0m[0m:[0m Sardi-Arc [GTK2/3][0m 
+[44C[0m[34m[1mTerminal[0m[0m:[0m script[0m 
+[44C[0m[34m[1mCPU[0m[0m:[0m Intel i7-6700K (2) @ 4.008GHz[0m 
+[44C[0m[34m[1mGPU[0m[0m:[0m 00:02.0 VMware SVGA II Adapter[0m 
+[44C[0m[34m[1mMemory[0m[0m:[0m 1181MiB / 3924MiB (30%)[0m 
+
+[44C[30m[40m   [31m[41m   [32m[42m   [33m[43m   [34m[44m   [35m[45m   [36m[46m   [37m[47m   [m
+[44C[38;5;8m[48;5;8m   [38;5;9m[48;5;9m   [38;5;10m[48;5;10m   [38;5;11m[48;5;11m   [38;5;12m[48;5;12m   [38;5;13m[48;5;13m   [38;5;14m[48;5;14m   [38;5;15m[48;5;15m   [m
+
+
+
+[?25h[?7h[?2004h[zach@sol quiz15]$ cat quiz15.cpp
+[?2004l// Zach McLean
+// 4/14/2022
+// 
+
+#include <iostream>
+/* #include <stdlib> */
+#include <cmath>
+
+int main() {
+	// declare four single dimensional arrays
+	// size will equal the amount of columns-1 in the array(number of diagnal entries)
+	int size;
+	std::cout<<"Enter num of rows: ";
+	std::cin>>size;
+	
+	double d_arr[size];
+	double u_arr[size-1];
+	double l_arr[size-1];
+	double b_arr[size];
+	for(int i = 0; i < 4; i++){
+		if(i == 0){
+			std::cout<<"Please enter diagnal array values seperated by space: ";
+			for(int j = 0; j < size; j++){
+				std::cin>>d_arr[j];
+				/* printf("d[%d]: %.2f \n", j, d_arr[j]); */
+			}
+		}
+		if(i == 1){
+			std::cout<<"Please enter upper array values seperated by space: ";
+			for(int j = 0; j < size-1; j++){
+				std::cin>>u_arr[j];
+				/* printf("d[%d]: %.2f \n", j, d_arr[j]); */
+			}
+		}
+		if(i == 2){
+			std::cout<<"Please enter lower array values seperated by space: ";
+			for(int j = 0; j < size-1; j++){
+				std::cin>>l_arr[j];
+				/* printf("d[%d]: %.2f \n", j, d_arr[j]); */
+			}
+		}	
+		if(i == 3){
+			std::cout<<"Please enter b array values seperated by space: ";
+			for(int j = 0; j < size; j++){
+				std::cin>>b_arr[j];
+				/* printf("d[%d]: %.2f \n", j, d_arr[j]); */
+			}
+		}
+	}
+	std::cout<<"\n";
+	/* double d_arr[] = {1.0, 1.0, 2.0, 7.0}; */
+	/* double u_arr[] = {3.0, -1.0, -1.0}; */
+	/* double l_arr[] = {2.0, 4.0, 5.0}; */
+	/* double b_arr[] = {7.0, 3.0, 8.0, 19.0}; */
+	double x_arr[] = {0.0, 0.0, 0.0, 0.0};
+
+	
+	// Forward Elimination for Tri-diagnal System
+	int zero = 0;
+	for(int i = 0; i < size-1; i++){
+		double m = l_arr[i] / d_arr[i];
+		/* std::cout<<"m: "<<m<<"\n"; */
+		l_arr[i] = l_arr[i] - (d_arr[i] * m);
+		d_arr[i+1] = d_arr[i+1] - (u_arr[i] * m);
+		b_arr[i+1] = b_arr[i+1] - (b_arr[i] * m);
+		/* for(int i = 0; i <= size-1; i++){ */
+		/* 	printf("d[%d]: %.2f \n", i, d_arr[i]); */
+		/* 	printf("b[%d]: %.2f \n", i, b_arr[i]); */
+		/* } */
+		/* std::cout<<"\n"; */
+	}
+	// Print the matrix after the forward elimination phase
+	for(int i = 0; i < size; i++){
+		if(i == 0)
+			printf(" | %.2f %.2f %d %d   | %.2f |\n", d_arr[i], u_arr[i], zero, zero, b_arr[i]);
+		if(i == 1)
+			printf(" | %d %.2f %.2f %d | %.2f |\n", zero, d_arr[i], u_arr[i], zero, b_arr[i]);
+		if(i == 2)
+			printf(" | %d %d %.2f %.2f | %.2f |\n", zero, zero, d_arr[i], u_arr[i], b_arr[i]);
+		if(i == 3)
+			printf(" | %d %d %d %.2f   | %.2f |\n", zero, zero, zero, d_arr[i], b_arr[i]);
+	}
+
+	std::cout<<"\n";
+	// Back Substitution for Tri-diagnal System
+	for(int i = size-1; i >= 0; i--){
+		printf("x[%d]= %.2f / %.2f \n", i+1, b_arr[i], d_arr[i]);
+		if(i == size-1){
+			x_arr[i] = b_arr[i] / d_arr[i];
+			printf("x[%d]: %.2f \n", i+1, x_arr[i]);
+		}else{
+			x_arr[i] = (b_arr[i] - x_arr[i+1] * u_arr[i]) / d_arr[i];
+			printf("x[%d]: %.2f \n", i+1, x_arr[i]);
+		}
+	}
+	return 0;
+}
+[?2004h[zach@sol quiz15]$ g++ quiz.cpp1.cpp5.cpp
+[?2004l[?2004h[zach@sol quiz15]$ ./a.out
+[?2004lEnter num of rows: 4
+Please enter diagnal array values seperated by space: 1 1 2 7
+Please enter upper array values seperated by space: 3 -1 -1
+Please enter lower array values seperated by space: 2 4 5
+Please enter b array values seperated by space: 7 3 8 19
+
+ | 1.00 3.00 0 0   | 7.00 |
+ | 0 -5.00 -1.00 0 | -11.00 |
+ | 0 0 1.20 -1.00 | -0.80 |
+ | 0 0 0 11.17   | 22.33 |
+
+x[4]= 22.33 / 11.17 
+x[4]: 2.00 
+x[3]= -0.80 / 1.20 
+x[3]: 1.00 
+x[2]= -11.00 / -5.00 
+x[2]: 2.00 
+x[1]= 7.00 / 1.00 
+x[1]: 1.00 
+[?2004h[zach@sol quiz15]$ exit
+[?2004lexit
+
+Script done on 2022-04-28 00:22:50-05:00 [COMMAND_EXIT_CODE="0"]

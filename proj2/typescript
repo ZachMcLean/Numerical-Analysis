@@ -1,0 +1,373 @@
+Script started on 2022-04-27 23:53:49-05:00 [TERM="alacritty" TTY="/dev/pts/0" COLUMNS="212" LINES="52"]
+[?25l[?7l[0m[34m[1m                    /-
+                   ooo:
+                  yoooo/
+                 yooooooo
+                yooooooooo
+               yooooooooooo
+             .yooooooooooooo
+            .oooooooooooooooo
+           .oooooooarcoooooooo
+          .ooooooooo-oooooooooo
+         .ooooooooo-  oooooooooo
+        :ooooooooo.    :ooooooooo
+       :ooooooooo.      :ooooooooo
+      :oooarcooo         .oooarcooo
+     :ooooooooy           .ooooooooo
+    :ooooooooo   [37m[0m[1m/ooooooooooooooooooo[0m[34m[1m
+   :ooooooooo      [37m[0m[1m.-ooooooooooooooooo.[0m[34m[1m
+  ooooooooo-             [37m[0m[1m-ooooooooooooo.[0m[34m[1m
+ ooooooooo-                 [37m[0m[1m.-oooooooooo.[0m[34m[1m
+ooooooooo.                     [37m[0m[1m-ooooooooo[0m[34m[1m[0m
+[20A[9999999D[44C[0m[1m[0m[1mzach[0m@[0m[1msol[0m 
+[44C[0m--------[0m 
+[44C[0m[34m[1mOS[0m[0m:[0m ArcoLinux[0m 
+[44C[0m[34m[1mKernel[0m[0m:[0m 5.17.4-arch1-1[0m 
+[44C[0m[34m[1mUptime[0m[0m:[0m 8 hours, 3 mins[0m 
+[44C[0m[34m[1mPackages[0m[0m:[0m 1449 (pacman)[0m 
+[44C[0m[34m[1mShell[0m[0m:[0m bash 5.1.16[0m 
+[44C[0m[34m[1mResolution[0m[0m:[0m 1920x975[0m 
+[44C[0m[34m[1mWM[0m[0m:[0m dwm[0m 
+[44C[0m[34m[1mTheme[0m[0m:[0m Arc-Dark [GTK2/3][0m 
+[44C[0m[34m[1mIcons[0m[0m:[0m Sardi-Arc [GTK2/3][0m 
+[44C[0m[34m[1mTerminal[0m[0m:[0m script[0m 
+[44C[0m[34m[1mCPU[0m[0m:[0m Intel i7-6700K (2) @ 4.008GHz[0m 
+[44C[0m[34m[1mGPU[0m[0m:[0m 00:02.0 VMware SVGA II Adapter[0m 
+[44C[0m[34m[1mMemory[0m[0m:[0m 1194MiB / 3924MiB (30%)[0m 
+
+[44C[30m[40m   [31m[41m   [32m[42m   [33m[43m   [34m[44m   [35m[45m   [36m[46m   [37m[47m   [m
+[44C[38;5;8m[48;5;8m   [38;5;9m[48;5;9m   [38;5;10m[48;5;10m   [38;5;11m[48;5;11m   [38;5;12m[48;5;12m   [38;5;13m[48;5;13m   [38;5;14m[48;5;14m   [38;5;15m[48;5;15m   [m
+
+
+
+[?25h[?7h[?2004h[zach@sol proj2]$ cat proj2.cpp
+[?2004l// Zach McLean
+// Numerical Analysis
+// 4/11/2022
+// Project 2
+// Approximate the roor of the function using Bisection, Newton's, and Secant Method
+// Including the use of Horners Algorithm to evaluate the Taylor Polynomial of e^x - 1 / x
+
+#include <iostream>
+#include <cmath>
+#include <stdio.h> //for printf
+#include <math.h> // cos(x) pow
+
+// define two seperate functions for evaluating Horner's Algorithm of f(x) & f'(x)
+//		& 3 functions for evaluating Bisection, Newton's, and Secant Method
+//
+// Initial Function is x^3 - 2x^2 - 5x + 6
+// f'(x) = 3x^2 - 4x - 5
+
+// c prefix indicates cos function
+double horners(double poly[], int n, double h);
+void bisection(double a, double b, double xTolerance, double yTolerance, double polyf[], int degf);
+void newtons(double x0, double xTolerance, double yTolerance, double polyf[], double polyd[], int degf, int degd);
+void secant(double x0, double x1, double xTolerance, double yTolerance, double polyf[], int degf);
+
+const int maxIterations = 20;
+
+int main() {
+	// Temporary hard coded value for initial guess
+	/* double x = 0.0; */
+	/* double y = 2.0; */
+	int c = '1';
+	bool stop = false;
+	double x, y;
+	while(stop == false){
+		std::cout<<"Please enter an interval[x y]: ";
+		std::cin>> x >> y;
+		std::cout<<"\n";
+		
+		// function
+		double polyf[4];
+		polyf[0] = 1.0;
+		polyf[1] = -2.0;
+		polyf[2] = -5.0;
+		polyf[3] = 6.0;
+
+		// derivative
+		double polyd[3];
+		polyd[0] = 3.0;
+		polyd[1] = -4.0;
+		polyd[2] = -5.0;
+
+		int degf = sizeof(polyf)/sizeof(polyf[0]); // calculate degree of p(x)
+		int degd = sizeof(polyd)/sizeof(polyd[0]); // calculate degree of p'(x)
+
+		double xTolerance = 0.001;
+		double yTolerance = 0.00001;
+
+		std::cout <<"================================================================"<<std::endl;
+		printf("Interval: [%.6f, %.6f]\n", x, y);
+		std::cout<<"\n";
+		
+		std::cout <<"================"<<std::endl;
+		std::cout <<"Bisection Method: \n";
+		bisection(x, y, xTolerance, yTolerance, polyf, degf);
+		std::cout <<"================"<<std::endl;
+		std::cout <<"Newton's Method: \n";
+		newtons(x, xTolerance, yTolerance, polyf, polyd, degf, degd);
+		std::cout <<"================"<<std::endl;
+		std::cout <<"Secant's Method: \n";
+		secant(x, y, xTolerance, yTolerance, polyf, degf);
+
+		std::cout<<"Would you like to enter another interval?(y=1/n=0): ";
+		std::cin>>c;
+		if(c == 0){
+			stop = true;
+		}else if(c > 1 || c < 0){
+			std::cout<<"invalid input";
+			stop = true;
+		}
+	}
+	return 0;
+}
+
+// calculate the horners algorithm for the values in the polynomial array
+// polyf == 6 + x(-5 + x(-2 + x(1)))
+// polyd == (-5) + x(-4 + x(3)) 
+double horners(double poly[], int n, double h) // g(x) for single precision
+{
+	double approx = 0.0;
+    // Evaluate approximate value of polynomial using Horner's method
+    for (int i = 0; i < n; i++){
+		if(i==0){
+			approx = poly[0];
+		}else{
+			approx = (approx * h) + poly[i] ;
+		}
+		/* std::cout<<"approx: "<<approx<<std::endl; */
+	}
+	return approx;
+}
+
+// Psuedocode:
+//	[a, b] = first two guesses; c = root = (a+b)/2
+//	Bisection Method:
+//	while (f(c)<0)
+//		if f(a)xf(b)<0
+//			if f(c)==0
+//				stop
+//			if f(a)xf(c)<0, there is a root inbetween [a, c]
+//				b == c
+//			else if f(c)xf(b)<0, there is a root in between [c, b]
+//				a == c
+//
+void bisection(double a, double b, double xTolerance, double yTolerance, double polyf[], int degf){
+	int i = 1;
+	double c = 0.0;
+	double fa = horners(polyf, degf, a); // calculate f(a)
+	double fb = horners(polyf, degf, b); // calculate f(b)
+	double fc = 0.0;
+	double x = 0.0;
+	if((fa*fb) < 0.0){
+		c = (a+b)/2.0;
+		std::cout <<"================================================================"<<std::endl;
+		std::cout <<"Iteration     Approx. root    x_tolerance    y_tolerance    "<<std::endl;
+		while(i <= maxIterations && xTolerance >= 0.001 && yTolerance >= 0.00001){
+			fc = horners(polyf, degf, c); // calculate f(c)
+			if(fc == 0.0){
+				xTolerance = abs(x - c);
+				yTolerance = abs(fc);
+				break;
+			}else{
+				fa = horners(polyf, degf, a); // calculate f(a)
+				fb = horners(polyf, degf, b); // calculate f(b)
+				if((fa * fb)>0){
+					x = a;
+					a = c;
+
+				}else{
+					x = b;
+					b = c;
+				}
+
+				c = (a+b)/2.0;
+				xTolerance = abs(x - c);
+				yTolerance = abs(fc);
+
+			printf("       %2d      %10.6f       %10.6f       %10.6f    \n",i, c, xTolerance, yTolerance);
+			i++;
+			}
+		}
+		/* printf("        %d      %.6f       %.6f       %.6f    \n",i, c, xTolerance, yTolerance); */
+		printf("Exact root found at %.6f \n", c);
+		std::cout <<"Number of iterations: " << i-1 <<std::endl;
+		std::cout<<"\n";
+
+	}
+	else{
+		std::cout<<"	found no root on the interval \n";
+		std::cout<<"\n";
+	}
+	/* bool foundRoot = false; */
+	/* while(i <= maxIterations && foundRoot == false && xTolerance >= 0.001 && yTolerance >= 0.00001){ */
+	/* 	c = (a+b) / 2.0; // calculate the midpoint of our two guesses */
+	/* 	/1* int degf = sizeof(*polyf)/sizeof(polyf[0]); // calculate degree of p(x) *1/ */
+
+	/* 	double fa = horners(polyf, degf, a); // calculate f(a) */
+	/* 	double fb = horners(polyf, degf, b); // calculate f(b) */
+	/* 	double fc = horners(polyf, degf, c); // calculate f(c) */
+	/* 	if((fa*fb) < 0.0){ */
+
+	/* 		if(fc == 0.0){ */
+	/* 			printf("%d       %.6f       %.6f       %.6f       \n",i, c, xTolerance, yTolerance); */
+	/* 			foundRoot = true; */
+	/* 		}else if(fa*fc < 0.0){ */
+	/* 			b = c; */
+
+	/* 		}else{ */
+	/* 			a = c; */
+	/* 		} */
+	/* 	}else{ */
+	/* 		std::cout<<"Found no root on the interval \n"; */
+	/* 		foundRoot = true; */
+	/* 	} */
+	/* 	/1* printf("%d       %.6f       %.6f       %.6f       \n",i, c, xTolerance, yTolerance); *1/ */
+		
+	/* 	xTolerance = b-c; */ 
+	/* 	yTolerance = abs(fc); */
+	/* 	i++; */
+
+	/* } */
+
+}
+//  start with first guess, not two
+//  Newtons Method:
+//  x(current guess) = x(last guess) - (f(x(last guess)) / f'(x(last guess)))
+//		x(current guess) becomes x(last guess)
+//		method keeps iterating until until root is found
+//
+
+void newtons(double x0, double xTolerance, double yTolerance, double polyf[], double polyd[], int degf, int degd){
+	std::cout <<"================================================================"<<std::endl;
+	std::cout <<"Iteration     Approx. root    x_tolerance    y_tolerance    "<<std::endl;
+	int i = 1;
+	double xi; // create approx. root
+	while(i <= maxIterations && (xTolerance >= 0.001 && yTolerance >= 0.00001)){
+		
+		double func = horners(polyf, degf, x0); // calculate p(x) for x0
+		double deriv = horners(polyd, degd, x0); // calculate p'(x) for x0
+		xi = x0 - (func/deriv); // newton formula
+		double funcy = horners(polyf, degf, xi);
+		/* printf("func, deriv, x0, x1: %f %f %f %f\n", func, deriv, x0, xi); */
+
+		xTolerance = abs(x0 - xi); // xTolerance = 0.001
+		yTolerance = abs(funcy); // |f(xi-1)| < tolerance = 0.00001
+		x0 = xi; // set x(last guess) == to our new approx. root
+		printf("       %2d      %10.6f       %10.6f       %10.6f    \n",i, xi, xTolerance, yTolerance);
+		i++; // decrease i until number of max iterations is reached
+	}
+	printf("    Appromimated root: %.6f \n    Number of iterations:  %d \n    x_tolerance: %.6f\n    y_tolerance: %.6f \n", xi, i-1, xTolerance, yTolerance);
+	std::cout<<"\n";
+}
+//  Take Newton's formula and replace the derivative with the slope of f(x)
+//  Need two initial guesses = x0 & x1
+//  Secant Method: 
+//  x2 = x1 - (f(x1) * (x1 - x0) / (f(x1) - f(x0))
+//		
+
+void secant(double x0, double x1, double xTolerance, double yTolerance, double polyf[], int degf){
+	std::cout <<"================================================================"<<std::endl;
+	std::cout <<"Iteration     Approx. root    x_tolerance    y_tolerance    "<<std::endl;
+	int i = 1;
+	double x2 = 0.0;
+	while(i <= maxIterations && xTolerance >= 0.001 && yTolerance >= 0.00001){
+		
+		/* int degf = sizeof(polyf)/sizeof(polyf[0]); // calculate degree of p(x) */
+		double func1 = horners(polyf, degf, x1); // calculate p(x) for x1
+		double func0 = horners(polyf, degf, x0); // calculate p(x) for x0
+		x2 = x1 - (func1*((x1 - x0)/(func1 - func0))); // secants formula
+		double funcy = horners(polyf, degf, x2);
+		xTolerance = abs(x1 - x2);
+		yTolerance = abs(funcy);
+		printf("       %2d      %10.6f       %10.6f       %10.6f    \n",i, x2, xTolerance, yTolerance);
+		x0 = x1; // set x(last guess) == to our new approx. root
+		x1 = x2;
+		i++; // decrease i until number of max iterations is reached
+	}
+	printf("    Appromimated root: %.6f \n    Number of iterations:  %d \n    x_tolerance: %.6f\n    y_tolerance: %.6f \n", x2, i-1, xTolerance, yTolerance);
+	std::cout<<"\n";
+}
+
+
+[?2004h[zach@sol proj2]$ g++ proj2.cpp
+[?2004l[?2004h[zach@sol proj2]$ ./a.out
+[?2004lPlease enter an interval[x y]: 0 4
+
+================================================================
+Interval: [0.000000, 4.000000]
+
+================
+Bisection Method: 
+	found no root on the interval 
+
+================
+Newton's Method: 
+================================================================
+Iteration     Approx. root    x_tolerance    y_tolerance    
+        1        1.200000         1.200000         1.152000    
+        2        0.989781         0.210219         0.061417    
+        3        0.999983         0.010202         0.000102    
+        4        1.000000         0.000017         0.000000    
+    Appromimated root: 1.000000 
+    Number of iterations:  4 
+    x_tolerance: 0.000017
+    y_tolerance: 0.000000 
+
+================
+Secant's Method: 
+================================================================
+Iteration     Approx. root    x_tolerance    y_tolerance    
+        1       -2.000000         6.000000         0.000000    
+    Appromimated root: -2.000000 
+    Number of iterations:  1 
+    x_tolerance: 6.000000
+    y_tolerance: 0.000000 
+
+Would you like to enter another interval?(y=1/n=0): 1
+Please enter an interval[x y]: 02  2
+
+================================================================
+Interval: [0.000000, 2.000000]
+
+================
+Bisection Method: 
+================================================================
+Iteration     Approx. root    x_tolerance    y_tolerance    
+Exact root found at 1.000000 
+Number of iterations: 0
+
+================
+Newton's Method: 
+================================================================
+Iteration     Approx. root    x_tolerance    y_tolerance    
+        1        1.200000         1.200000         1.152000    
+        2        0.989781         0.210219         0.061417    
+        3        0.999983         0.010202         0.000102    
+        4        1.000000         0.000017         0.000000    
+    Appromimated root: 1.000000 
+    Number of iterations:  4 
+    x_tolerance: 0.000017
+    y_tolerance: 0.000000 
+
+================
+Secant's Method: 
+================================================================
+Iteration     Approx. root    x_tolerance    y_tolerance    
+        1        1.200000         0.800000         1.152000    
+        2        0.876404         0.323596         0.754961    
+        3        1.004515         0.128111         0.027070    
+        4        1.000081         0.004435         0.000483    
+        5        1.000000         0.000081         0.000000    
+    Appromimated root: 1.000000 
+    Number of iterations:  5 
+    x_tolerance: 0.000081
+    y_tolerance: 0.000000 
+
+Would you like to enter another interval?(y=1/n=0): 0
+[?2004h[zach@sol proj2]$ exit
+[?2004lexit
+
+Script done on 2022-04-27 23:54:52-05:00 [COMMAND_EXIT_CODE="0"]

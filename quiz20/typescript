@@ -1,0 +1,156 @@
+Script started on 2022-04-28 00:06:09-05:00 [TERM="alacritty" TTY="/dev/pts/0" COLUMNS="212" LINES="52"]
+[?25l[?7l[0m[34m[1m                    /-
+                   ooo:
+                  yoooo/
+                 yooooooo
+                yooooooooo
+               yooooooooooo
+             .yooooooooooooo
+            .oooooooooooooooo
+           .oooooooarcoooooooo
+          .ooooooooo-oooooooooo
+         .ooooooooo-  oooooooooo
+        :ooooooooo.    :ooooooooo
+       :ooooooooo.      :ooooooooo
+      :oooarcooo         .oooarcooo
+     :ooooooooy           .ooooooooo
+    :ooooooooo   [37m[0m[1m/ooooooooooooooooooo[0m[34m[1m
+   :ooooooooo      [37m[0m[1m.-ooooooooooooooooo.[0m[34m[1m
+  ooooooooo-             [37m[0m[1m-ooooooooooooo.[0m[34m[1m
+ ooooooooo-                 [37m[0m[1m.-oooooooooo.[0m[34m[1m
+ooooooooo.                     [37m[0m[1m-ooooooooo[0m[34m[1m[0m
+[20A[9999999D[44C[0m[1m[0m[1mzach[0m@[0m[1msol[0m 
+[44C[0m--------[0m 
+[44C[0m[34m[1mOS[0m[0m:[0m ArcoLinux[0m 
+[44C[0m[34m[1mKernel[0m[0m:[0m 5.17.4-arch1-1[0m 
+[44C[0m[34m[1mUptime[0m[0m:[0m 8 hours, 15 mins[0m 
+[44C[0m[34m[1mPackages[0m[0m:[0m 1449 (pacman)[0m 
+[44C[0m[34m[1mShell[0m[0m:[0m bash 5.1.16[0m 
+[44C[0m[34m[1mResolution[0m[0m:[0m 1920x975[0m 
+[44C[0m[34m[1mWM[0m[0m:[0m dwm[0m 
+[44C[0m[34m[1mTheme[0m[0m:[0m Arc-Dark [GTK2/3][0m 
+[44C[0m[34m[1mIcons[0m[0m:[0m Sardi-Arc [GTK2/3][0m 
+[44C[0m[34m[1mTerminal[0m[0m:[0m script[0m 
+[44C[0m[34m[1mCPU[0m[0m:[0m Intel i7-6700K (2) @ 4.008GHz[0m 
+[44C[0m[34m[1mGPU[0m[0m:[0m 00:02.0 VMware SVGA II Adapter[0m 
+[44C[0m[34m[1mMemory[0m[0m:[0m 1172MiB / 3924MiB (29%)[0m 
+
+[44C[30m[40m   [31m[41m   [32m[42m   [33m[43m   [34m[44m   [35m[45m   [36m[46m   [37m[47m   [m
+[44C[38;5;8m[48;5;8m   [38;5;9m[48;5;9m   [38;5;10m[48;5;10m   [38;5;11m[48;5;11m   [38;5;12m[48;5;12m   [38;5;13m[48;5;13m   [38;5;14m[48;5;14m   [38;5;15m[48;5;15m   [m
+
+
+
+[?25h[?7h[?2004h[zach@sol quiz20]$ cat quiz20.cpp
+[?2004l// Zach McLean
+// Numerical Analysis
+// 4/27/2022
+// Quiz 20
+// Calculate and verify the answers of Quiz 19 using Eulers and Huen's Method
+// to find the approximate value of x' = x + t*t with x(0) = 1 && h = b - a / n
+//										a = 0 ; b = 1 ; n = 5
+//
+// Heun's method is a two step process and can be written as
+// Step 1: K = x(t) + h*f(t, x(t)) (Euler's Method)
+//			 = x(t) + h * x'(t)
+//					= (x(t) + t*t)
+// Step 2: x(t+h) = x(t) + 1/2*h*[f(t, x(t)) + f(t+h, K)]
+//								 [(x(t) + t*t) + (K + x(t+h))]
+//
+// Compute the approximate value of x(1)
+//
+
+#include <iostream>
+#include <stdio.h> // printf
+
+double func(double x, double t);
+
+int main(){
+	std::cout<<"\nFor ODE: x' = (x + t^2) and x(0) = 1. \n";
+	int n; // number of sub intervals
+	std::cout<<"\nEnter number of iterations(5): ";
+	std::cin>>n;
+	std::cout<<"\n";
+
+	double t = 0.0;
+	double x = 1.0;
+	double h = (x-t)/n;
+	double K=0.0;
+	bool stop = false;
+	double k[n];
+
+	printf("Compute Euler's method for x(%.2f) with %d iterations. \n", x, n);
+	for(int i = 0; i < n; i++){
+		x = x + (h * func(x, t));
+		t = t+h;
+		printf("x(%.2f)= %.2f \n", t, x);
+	}
+	std::cout<<"\n";
+
+	x = 1.0;
+	t = 0.0;
+	printf("Compute Heuns method for x(%.2f) with %d iterations. \n", x, n);
+	for(int i = 0; i < n; i++){
+		K = x + (h * func(x, t));
+		x = x + ((h/2) * ((func(x, t) + (func(K, t+h)))));
+		t = t + h;
+		printf("x(%.2f + h)= %.2f \n", t, x);
+	}
+	std::cout<<"\n";
+
+	x = 1.0;
+	t = 0.0;
+	n = 1; // Entire sub-interval
+	printf("Compute Runge-Kutta method for x(%.f) with %d iterations. \n", x, n);
+	h = (x-t)/n;
+	while(stop==false){
+		k[0] = h*(func(x, t));
+		k[1] = h*(func(x + (k[0]/2), t + (h/2)));
+		k[2] = h*(func(x + (k[1]/2), t + (h/2)));
+		k[3] = h*(func(x + k[2], t+h));
+		K = x + ((1.0/6.0) * (k[0] + 2*k[1] + 2*k[2] + k[3]));
+		printf("x(%.f)= %.2f \n", h, K);
+		stop = true;
+	}
+	std::cout<<"\n";
+}
+
+
+
+
+
+double func(double x, double t){
+	return (x + (t*t));	
+}
+
+
+[?2004h[zach@sol quiz20]$ g++ quiz.cpp
+[?2004l[01m[Kcc1plus:[m[K [01;31m[Kfatal error: [m[Kquiz.cpp: No such file or directory
+compilation terminated.
+[?2004h[zach@sol quiz20]$ g++ quiz.cpp2.cpp0.cpp
+[?2004l[?2004h[zach@sol quiz20]$ ,/a.out[1P/a.out./a.out
+[?2004l
+For ODE: x' = (x + t^2) and x(0) = 1. 
+
+Enter number of iterations(5): 5
+
+Compute Euler's method for x(1.00) with 5 iterations. 
+x(0.20)= 1.20 
+x(0.40)= 1.45 
+x(0.60)= 1.77 
+x(0.80)= 2.20 
+x(1.00)= 2.76 
+
+Compute Heuns method for x(1.00) with 5 iterations. 
+x(0.20 + h)= 1.22 
+x(0.40 + h)= 1.51 
+x(0.60 + h)= 1.90 
+x(0.80 + h)= 2.43 
+x(1.00 + h)= 3.14 
+
+Compute Runge-Kutta method for x(1) with 1 iterations. 
+x(1)= 3.15 
+
+[?2004h[zach@sol quiz20]$ exit
+[?2004lexit
+
+Script done on 2022-04-28 00:06:52-05:00 [COMMAND_EXIT_CODE="0"]

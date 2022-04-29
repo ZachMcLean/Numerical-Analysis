@@ -1,0 +1,245 @@
+Script started on 2022-04-28 00:14:05-05:00 [TERM="alacritty" TTY="/dev/pts/0" COLUMNS="212" LINES="52"]
+[?25l[?7l[0m[34m[1m                    /-
+                   ooo:
+                  yoooo/
+                 yooooooo
+                yooooooooo
+               yooooooooooo
+             .yooooooooooooo
+            .oooooooooooooooo
+           .oooooooarcoooooooo
+          .ooooooooo-oooooooooo
+         .ooooooooo-  oooooooooo
+        :ooooooooo.    :ooooooooo
+       :ooooooooo.      :ooooooooo
+      :oooarcooo         .oooarcooo
+     :ooooooooy           .ooooooooo
+    :ooooooooo   [37m[0m[1m/ooooooooooooooooooo[0m[34m[1m
+   :ooooooooo      [37m[0m[1m.-ooooooooooooooooo.[0m[34m[1m
+  ooooooooo-             [37m[0m[1m-ooooooooooooo.[0m[34m[1m
+ ooooooooo-                 [37m[0m[1m.-oooooooooo.[0m[34m[1m
+ooooooooo.                     [37m[0m[1m-ooooooooo[0m[34m[1m[0m
+[20A[9999999D[44C[0m[1m[0m[1mzach[0m@[0m[1msol[0m 
+[44C[0m--------[0m 
+[44C[0m[34m[1mOS[0m[0m:[0m ArcoLinux[0m 
+[44C[0m[34m[1mKernel[0m[0m:[0m 5.17.4-arch1-1[0m 
+[44C[0m[34m[1mUptime[0m[0m:[0m 8 hours, 23 mins[0m 
+[44C[0m[34m[1mPackages[0m[0m:[0m 1449 (pacman)[0m 
+[44C[0m[34m[1mShell[0m[0m:[0m bash 5.1.16[0m 
+[44C[0m[34m[1mResolution[0m[0m:[0m 1920x975[0m 
+[44C[0m[34m[1mWM[0m[0m:[0m dwm[0m 
+[44C[0m[34m[1mTheme[0m[0m:[0m Arc-Dark [GTK2/3][0m 
+[44C[0m[34m[1mIcons[0m[0m:[0m Sardi-Arc [GTK2/3][0m 
+[44C[0m[34m[1mTerminal[0m[0m:[0m script[0m 
+[44C[0m[34m[1mCPU[0m[0m:[0m Intel i7-6700K (2) @ 4.008GHz[0m 
+[44C[0m[34m[1mGPU[0m[0m:[0m 00:02.0 VMware SVGA II Adapter[0m 
+[44C[0m[34m[1mMemory[0m[0m:[0m 1179MiB / 3924MiB (30%)[0m 
+
+[44C[30m[40m   [31m[41m   [32m[42m   [33m[43m   [34m[44m   [35m[45m   [36m[46m   [37m[47m   [m
+[44C[38;5;8m[48;5;8m   [38;5;9m[48;5;9m   [38;5;10m[48;5;10m   [38;5;11m[48;5;11m   [38;5;12m[48;5;12m   [38;5;13m[48;5;13m   [38;5;14m[48;5;14m   [38;5;15m[48;5;15m   [m
+
+
+
+[?25h[?7h[?2004h[zach@sol quiz18]$ cat quiz18.cpp
+[?2004l// Zach McLean
+// 4/18/2022
+// Quiz 18
+//
+// Implement Trapezoids rule T[si]=(1/2*h*(f(0) + 2*f(1) + 2*f(2)+...+f(n-1)))
+//
+// Richardson's extrapolation, 
+//
+// and Simpson's rule
+//
+// for definite integral approximation
+//
+// Write seperate functions for each integrand and end each 
+// of the three methods
+
+#include <iostream>
+#include <cmath>
+
+double f1(double);
+double f2(double);
+double simpsons(double a, double b, double(*f)(double), double ti);
+double richardsons(double a, double b, int v, double(*f)(double), int ti);
+double trapezoid(double a, double b, int val, double(*f)(double), double ti);
+
+double simpsons(double a, double b, double(*f)(double), double ti){
+	double h = (b-a) / ti;
+	double sum = (*f)(a) + (*f)(b);
+	for(double i = a+h; i<b;){
+		sum += (4 * (*f)(i));
+		i+=(2*h);
+	}
+	for(double i = a+(2*h); i<b;){
+		sum += (2 * (*f)(i));
+		i+=(2*h);
+	}
+	/* sum += (4 * (*f)(b-1)); */
+	return sum * (h/3);
+}
+
+double richardsons(double a, double b, int v, double(*f)(double), int ti){
+	// x = a2n + ((A2n - An) / 3)	
+	double An = trapezoid(a, b, v, (*f), ti);
+	double nn = 2*ti;
+	double A2n = trapezoid(a, b, v, (*f), nn);
+	double x = A2n + ((A2n - An) / 3);
+	return x;
+}
+
+double trapezoid(double a, double b, int val, double(*f)(double), double ti){
+	// (1/2)*(h)*[f(x0)+f(xn)] * Ef(xn)]
+		double h = (b - a) / ti;
+		double sum = (*f)(a) + (*f)(b);
+		double x = a+h;
+		for(int i = 1; i < ti; i++){
+			sum += 2*(*f)(x);
+			x += h;
+		}
+		return (h/2)*sum;
+}
+
+double f1(double x){
+	// [1, 2]x^-1 dx
+	return (1 / x);
+}
+
+double f2(double x){
+	return (1 / (pow(x, 2.0) + 2.0));
+}
+
+int main(){
+// create the bounds for the first function(a, b) = (1, 2)
+	// first create functions for calculating the integrand
+	// second create three functions for each method to calculate the integrands
+	// trapezoid func1 = // [1, 2]x^-1 dx, sub interval 1 = [1 2],h=1, 2 = [1 3/2 2],h=0.5, 4 = [1 5/4 3/2 7/4 2],h=0.25
+
+	double a = 1.0;
+	double b = 2.0;
+	double ti = 1.0; // initial number of sub-intervals 
+	int v = 0; // this is to determine whether we want to integrate func1 or func2
+
+	double trap = 0.0;
+	std::cout<<"Compute Integral[1, 2]; x^-1 dx using Trapezoid rule: \n";
+	for(int i = 0; i < 3; i++){
+		trap = trapezoid(a, b, v, f1, ti);
+		printf("T[%.0f]: %0.5f \n", ti, trap);
+		ti *= 2.0;
+	}
+	std::cout<<"\n";
+
+	double richard = 0.0;
+	std::cout<<"Compute Integral[1, 2]; x^-1 dx using Richardson's extrapolation: \n";
+	ti = 2.0;
+	for(int i = ti; i <= 4;){
+		richard = richardsons(a, b, v, f1, ti);
+		printf("R[%.0f]: %0.5f \n", ti, richard);
+		ti *= 2.0;
+		i = ti;
+	}
+	std::cout<<"\n";
+
+	double simp = 0.0;
+	std::cout<<"Compute Integral[1, 2]; x^-1 dx using Simpson's rule: \n";
+	ti = 2.0;
+	for(int i = ti; i <= 4;){
+		simp = simpsons(a, b, f1, ti);
+		printf("S[%.0f]: %0.5f \n", ti, simp);
+		ti *= 2.0;
+		i = ti;
+	}
+	std::cout<<"\n";
+
+	a = 0.0;
+	b = 1.0;
+	trap = 0.0;
+	ti = 1.0;
+
+	std::cout<<"Compute Integral[0, 1]; (x^2 + 2)^-1 dx using Trapezoid rule: \n";
+	for(int i = 0; i < 3; i++){
+		trap = trapezoid(a, b, v, f2, ti);
+		printf("T[%.0f]: %0.5f \n", ti, trap);
+		ti *= 2.0;
+	}
+	std::cout<<"\n";
+
+	richard = 0.0;
+	ti = 2.0;
+
+	std::cout<<"Compute Integral[0, 1]; (x^2 + 2)^-1 dx using Richardson's extrapolation: \n";
+	for(int i = ti; i <= 4;){
+		richard = richardsons(a, b, v, f2, ti);
+		printf("R[%.0f]: %0.5f \n", ti, richard);
+		ti *= 2.0;
+		i = ti;
+	}
+	std::cout<<"\n";
+
+	simp = 0.0;
+	ti = 2.0;
+
+	std::cout<<"Compute Integral[0, 1]; (x^2 + 2)^-1 dx using Simpson's rule: \n";
+	for(int i = ti; i <= 4;){
+		simp = simpsons(a, b, f2, ti);
+		printf("S[%.0f]: %0.5f \n", ti, simp);
+		ti *= 2.0;
+		i = ti;
+	}
+	return 0;
+}
+/* double fun(double x){ */
+	
+/* } */
+
+/* double sumIntegral(double lowBound, int n, double dx){ */
+/* 	double sum = 0; */
+/* 	for(int i = 0; i<n; i++){ */
+/* 		double xi = lowBound+i*dx; */
+/* 		double funValue = fun(xi); */
+/* 		double rectangleArea = funValue*dx; */
+/* 		sum += rectangleArea; */
+/* 	} */
+/* 	return sum; */
+/* } */
+
+/* int main() */
+/* { */
+/* 	double lowBound = 1; */
+/* 	double upBound = 2; */
+/* 	int n = 5; */
+/* 	double dx = (double)(upBound - lowBound)/n; */
+/* 	double result = sumIntegral(lowBound, n, dx); */
+/* } */
+[?2004h[zach@sol quiz18]$ g++ quiz18.cpp
+[?2004l[?2004h[zach@sol quiz18]$ ./a.out
+[?2004lCompute Integral[1, 2]; x^-1 dx using Trapezoid rule: 
+T[1]: 0.75000 
+T[2]: 0.70833 
+T[4]: 0.69702 
+
+Compute Integral[1, 2]; x^-1 dx using Richardson's extrapolation: 
+R[2]: 0.69325 
+R[4]: 0.69315 
+
+Compute Integral[1, 2]; x^-1 dx using Simpson's rule: 
+S[2]: 0.69444 
+S[4]: 0.69325 
+
+Compute Integral[0, 1]; (x^2 + 2)^-1 dx using Trapezoid rule: 
+T[1]: 0.41667 
+T[2]: 0.43056 
+T[4]: 0.43405 
+
+Compute Integral[0, 1]; (x^2 + 2)^-1 dx using Richardson's extrapolation: 
+R[2]: 0.43522 
+R[4]: 0.43521 
+
+Compute Integral[0, 1]; (x^2 + 2)^-1 dx using Simpson's rule: 
+S[2]: 0.43519 
+S[4]: 0.43522 
+[?2004h[zach@sol quiz18]$ exit
+[?2004lexit
+
+Script done on 2022-04-28 00:14:26-05:00 [COMMAND_EXIT_CODE="0"]
